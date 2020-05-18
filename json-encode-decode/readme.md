@@ -1,7 +1,5 @@
 # Golang 中的json序列化与反序列化透析与问题总结
 
-
-
 ## Golang 官方的json encode
 ```
 func Marshal(v interface{}) ([]byte, error)
@@ -27,20 +25,16 @@ The "omitempty" option specifies that the field should be omitted from the encod
 
 As a special case, if the field tag is "-", the field is always omitted. Note that a field with name "-" can still be generated using the tag "-,".
 ```
-
-
-func Marshal(v interface{}) ([]byte, error)
-
-
-
+func Marshal(v interface{}) ([]byte, error)   
+如官方文档所述，在序列化的时候，会对一些特殊字符（如&等）进行HTMLEscape编码，将其转换为对应的unicode字符；
+关于unincode字符编码，可以查看[这里](https://zh.wikipedia.org/wiki/Unicode%E5%AD%97%E7%AC%A6%E5%88%97%E8%A1%A8)
 ### 问题记录
-- 依赖Json内容统计长度
+如果因为序列化或转义，可能会在特定业务中操作一些不一致的问题，需要可以注意下，比如：
 - 依赖Json的内容做加解密等等操作
-- unicode编码资源  https://zh.wikipedia.org/wiki/Unicode%E5%AD%97%E7%AC%A6%E5%88%97%E8%A1%A8
-
 
 
 ## Golang 官方的json decode
+
 
 
 ## 第三方的库
