@@ -30,7 +30,7 @@ As a special case, if the field tag is "-", the field is always omitted. Note th
 func Marshal(v interface{}) ([]byte, error)
 
 https://golang.org/pkg/encoding/json/#Marshal
-https://github.com/json-iterator/go
+https://g  ithub.com/json-iterator/go
 http://vearne.cc/archives/433
 https://javasgl.github.io/go-json-iterator/
 http://jsoniter.com/index.cn.html
@@ -47,6 +47,8 @@ https://hacpai.com/article/1524558037151
 ### 问题记录
 - 依赖Json内容统计长度
 - 依赖Json的内容做加解密等等操作
+- unicode编码资源  https://zh.wikipedia.org/wiki/Unicode%E5%AD%97%E7%AC%A6%E5%88%97%E8%A1%A8
+
 
 
 ## Golang 官方的json decode
@@ -54,6 +56,8 @@ https://hacpai.com/article/1524558037151
 
 ## 第三方的库
 ### 滴滴出行开源的json库
+https://github.com/json-iterator/go 
+
 
 
 ## 性能比对与原理透析 
