@@ -1,5 +1,7 @@
 # Golang 中的json序列化与反序列化透析与问题总结
 
+
+
 ## Golang 官方的json encode
 ```
 func Marshal(v interface{}) ([]byte, error)
@@ -29,20 +31,7 @@ As a special case, if the field tag is "-", the field is always omitted. Note th
 
 func Marshal(v interface{}) ([]byte, error)
 
-https://golang.org/pkg/encoding/json/#Marshal
-https://g  ithub.com/json-iterator/go
-http://vearne.cc/archives/433
-https://javasgl.github.io/go-json-iterator/
-http://jsoniter.com/index.cn.html
-http://xiaorui.cc/archives/5108
-https://blog.csdn.net/wangshubo1989/article/details/78709802
-https://blog.csdn.net/H517604180/article/details/83307978
-https://zhuanlan.zhihu.com/p/111733692
-http://www.hatlonely.com/2018/01/28/golang-json-%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90/index.html
-https://zh.wikipedia.org/wiki/Unicode%E5%AD%97%E7%AC%A6%E5%88%97%E8%A1%A8
-https://studygolang.com/articles/19721
-https://studygolang.com/articles/6050
-https://hacpai.com/article/1524558037151
+
 
 ### 问题记录
 - 依赖Json内容统计长度
