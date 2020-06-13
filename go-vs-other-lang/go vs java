@@ -1,0 +1,152 @@
+**声明** 
+本文非原创，翻译自经典博文[https://yourbasic.org/golang/go-vs-java/](https://yourbasic.org/golang/go-vs-java/)   
+
+Go vs. Java: 15 main differences
+yourbasic.org/golang
+
+https://yourbasic.org/golang/java-go.png
+
+The following Java code, adapted from [Effective Java](https://www.amazon.com/Effective-Java-2nd-Joshua-Bloch/dp/0321356683), implements an immutable class representing a complex number.
+```java
+public final class Complex {
+    private final double re;
+    private final double im;
+
+    public Complex(double re, double im) {
+        if (Double.isNaN(re) || Double.isNaN(im)) {
+            throw new ArithmeticException();
+        }
+        this.re = re;
+        this.im = im;
+    }
+
+    public double realPart()      { return re; }
+    public double imaginaryPart() { return im; }
+
+    public Complex add(Complex c) {
+        return new Complex(re + c.re, im + c.im);
+    }
+
+    @Override public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof Complex))
+            return false;
+        Complex c = (Complex) o;
+        return Double.compare(re, c.re) == 0 &&
+               Double.compare(im, c.im) == 0;
+    }
+
+    @Override public int hashCode() {
+        int result = 17 + Double.hashCode(re);
+        result = 31 * result + Double.hashCode(im);
+        return result;
+    }
+
+    @Override public String toString() {
+        return "(" + re + (im < 0 ? "" : "+") + im + "i)";
+    }
+
+    public static void main(String[] args) {
+        Complex z = new Complex(1, 2);
+        System.out.println(z.add(z));
+    }
+}
+```
+
+The same program written in idiomatic Go would consist of two separate [packages](https://yourbasic.org/golang/packages-explained/).
+
+```
+package complex
+
+import (
+    "fmt"
+    "math"
+)
+
+type Complex struct {
+    re, im float64
+}
+
+func New(re, im float64) Complex {
+    if math.IsNaN(re) || math.IsNaN(im) {
+        panic("NaN")
+    }
+    return Complex{re, im}
+}
+
+func (c Complex) Real() float64 { return c.re }
+func (c Complex) Imag() float64 { return c.im }
+
+func (c Complex) Add(d Complex) Complex {
+    return New(c.re+d.re, c.im+d.im)
+}
+
+func (c Complex) String() string {
+    if c.im < 0 {
+        return fmt.Sprintf("(%g%gi)", c.re, c.im)
+    }
+    return fmt.Sprintf("(%g+%gi)", c.re, c.im)
+}
+```
+
+```
+package main
+
+import (
+    "complex"
+    "fmt"
+)
+
+func main() {
+    z := complex.New(1, 2)
+    fmt.Println(z.Add(z))
+}
+```
+Note that in this case Go uses struct values where Java uses references to objects. Also, the equals and hashCode methods are omitted since Go already defines equality for structs with comparable fields.
+
+
+## Main differences
+
+### Built-in types
+- Strings are provided by the language; a string behaves like a slice of bytes, but is immutable.
+- Hash tables are provided by the language. They are called maps.
+
+### Pointers and references
+- Go offers pointers to values of all types, not just objects and arrays. For any type T, there is a corresponding pointer type *T, denoting pointers to values of type T.
+- Arrays in Go are values. When an array is used as a function parameter, the function receives a copy of the array, not a pointer to it. However, in practice functions often use slices for parameters; slices are references to underlying arrays.
+- Certain types (maps, slices, and channels) are passed by reference, not by value. That is, passing a map to a function does not copy the map; if the function changes the map, the change will be seen by the caller. In Java terms, one can think of this as being a reference to the map.
+
+### Error handling
+Instead of exceptions, Go uses errors to signify events such as end-of-file, and run-time panics for run-time errors such as attempting to index an array out of bounds.
+
+### Object-oriented programming
+- Go does not have classes with constructors. Instead of instance methods, a class inheritance hierarchy, and dynamic method lookup, Go provides structs and interfaces.
+- Go allows methods on any type; no boxing is required. The method receiver, which corresponds to this in Java, can be a direct value or a pointer.
+- Go provides two access levels, analogous to Java’s public and package-private. Top-level declarations are public if their names start with an upper-case letter, otherwise they are package-private.
+Learn more: [Object-oriented programming in Go without inheritance](https://yourbasic.org/golang/inheritance-object-oriented/).
+
+Functional programming
+Functions in Go are first class citizens. Function values can be used and passed around just like other values and function literals may refer to variables defined in a enclosing function.
+Learn more: Functional programming in Go [case study].
+
+Concurrency
+Separate threads of execution, goroutines, and communication channels between them, channels, are provided by the language.
+Learn more: Concurrent programming in Go [tutorial].
+
+Omitted features
+Go does not support implicit type conversion. Operations that mix different types require an explicit conversion. Instead Go offers Untyped numeric constants with no limits.
+Go does not support function overloading. Functions and methods in the same scope must have unique names. For alternatives, see Optional parameters and method overloading.
+Go has some built-in generic data types, such as slices and maps, and generic functions, such as append and copy. However, there is no mechanism for writing your own generic functions. For alternatives, see Generics (alternatives and workarounds).
+Complex numbers
+Strangely enough, Go has built-in support for complex numbers.
+
+z := 1+2i
+fmt.Println(z + z)
+It’s the least used feature of the language. By far.
+
+Further reading
+Why Go? – Key advantages you may have overlooked
+Why Go? discusses some main reasons why Go can make it easier (than Java or Python) to write correct, clear and efficient code.
+
+
