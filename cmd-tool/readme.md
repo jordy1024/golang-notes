@@ -7,3 +7,23 @@ go tool objdump -s "runtime\.init\b" hello
 
 ## 编译
 go build -gcflags "-N -l " -o hello hello.go
+
+```
+➜  src cat main.go
+package main
+
+import (
+	"helloworld"
+)
+
+func main() {
+	helloworld.PrintMe()
+}
+➜  src
+➜  src tree helloworld
+helloworld
+├── helloworld.go
+└── helloworld.s
+
+0 directories, 2 files
+```
