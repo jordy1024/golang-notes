@@ -1,5 +1,3 @@
-runtime
-
 ## 系统环境
 
 ```
@@ -155,8 +153,58 @@ Breakpoint 2 at 0x44be00: file /usr/local/src/golang/go/src/runtime/asm_amd64.s,
 Breakpoint 3 at 0x44be10: file /usr/local/src/golang/go/src/runtime/asm_amd64.s, line 89.
 
 看到rt0_go定义位于asm_amd64.s文件的约89行，好戏才刚刚开始，对于asm_amd64.s文件
+我们逐步跟踪：rt0_go->nocpuinfo->ok
+看到在ok 块中调用了几个核心步骤，正是在该块中，完成了初始化和运行时的核心步骤
+
+231 ok:
+ 232     // set the per-goroutine and per-mach "registers"
+ 233     get_tls(BX)
+ 234     LEAQ    runtime·g0(SB), CX
+ 235     MOVQ    CX, g(BX)
+ 236     LEAQ    runtime·m0(SB), AX
+ 237 
+ 238     // save m->g0 = g0
+ 239     MOVQ    CX, m_g0(AX)
+ 240     // save m0 to g0->m
+ 241     MOVQ    AX, g_m(CX)
+ 242 
+ 243     CLD             // convention is D is always left cleared
+ 244     CALL    runtime·check(SB)
+ 245 
+ 246     MOVL    16(SP), AX      // copy argc
+ 247     MOVL    AX, 0(SP)
+ 248     MOVQ    24(SP), AX      // copy argv
+ 249     MOVQ    AX, 8(SP)
+ 250     CALL    runtime·args(SB)
+ 251     CALL    runtime·osinit(SB)
+ 252     CALL    runtime·schedinit(SB)
+ 253 
+ 254     // create a new goroutine to start program
+ 255     MOVQ    $runtime·mainPC(SB), AX     // entry
+ 256     PUSHQ   AX
+ 257     PUSHQ   $0          // arg size
+ 258     CALL    runtime·newproc(SB)
+ 259     POPQ    AX
+ 260     POPQ    AX
+ 261 
+ 262     // start this M
+ 263     CALL    runtime·mstart(SB)
+ 264 
+ 265     MOVL    $0xf1, 0xf1  // crash
+ 266     RET
+ 267 
+ 268 DATA    runtime·mainPC+0(SB)/8,$runtime·main(SB)
+ 269 GLOBL   runtime·mainPC(SB),RODATA,$8
+
+初步看到，初始化过程陆续调用了几个关键的函数，如：
+runtime·args(SB)，runtime·osinit(SB)，runtime·schedinit(SB)，runtime·mainPC(SB)，runtime·newproc(SB)，runtime·mstart(SB)，runtime·main(SB)
+
+可以清洗地看到，在执行咱们的main.main之前，运行时进行了多个其他的步骤以完成初始化工作，即得出结论：
+main.main并不是go 可执行的入口！
+下面我们来专门的分析初始化的过程，了解golang runtime启动时的精髓.
 
 ```
+
 
 
 
